@@ -70,6 +70,30 @@ class RenderTests(unittest.TestCase):
             api_matrix.render(SPEC, SOURCE, {"POST /sync/history": "done"})
 
 
+class FetchTests(unittest.TestCase):
+    def test_non_https_schemes_are_refused_before_connecting(self):
+        with mock.patch("http.client.HTTPSConnection") as connection:
+            for url in ("file:///etc/passwd", "http://developer.trakt.tv/openapi.json", "ftp://x/y", "https:///no-host"):
+                with self.subTest(url=url), self.assertRaisesRegex(ValueError, "only https"):
+                    api_matrix.fetch(dict(SOURCE, url=url))
+            connection.assert_not_called()
+
+    def test_non_200_answer_is_refused(self):
+        with mock.patch("http.client.HTTPSConnection") as connection:
+            connection.return_value.getresponse.return_value.status = 301
+            with self.assertRaisesRegex(ValueError, "HTTP 301"):
+                api_matrix.fetch(SOURCE)
+            connection.return_value.close.assert_called_once()
+
+    def test_oversized_document_is_refused(self):
+        with mock.patch("http.client.HTTPSConnection") as connection:
+            response = connection.return_value.getresponse.return_value
+            response.status = 200
+            response.read.return_value = b"x" * (api_matrix.MAX_SPEC_BYTES + 1)
+            with self.assertRaisesRegex(ValueError, "larger than"):
+                api_matrix.fetch(SOURCE)
+
+
 class MainTests(unittest.TestCase):
     def setUp(self):
         self.dir = Path(tempfile.mkdtemp())

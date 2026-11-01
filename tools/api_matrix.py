@@ -17,10 +17,11 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import http.client
 import json
 import re
 import sys
-import urllib.request
+import urllib.parse
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -141,9 +142,19 @@ def render(spec: dict, source: dict, status: dict) -> str:
 
 
 def fetch(source: dict) -> bytes:
-    request = urllib.request.Request(source["url"], headers={"User-Agent": "jellysin-plugin-trakt api_matrix"})
-    with urllib.request.urlopen(request, timeout=FETCH_TIMEOUT_SECONDS) as response:  # noqa: S310 (pinned https URL)
+    """GET the pinned document over HTTPS only; any other scheme, a redirect or a non-200 answer is an error."""
+    url = urllib.parse.urlsplit(source["url"])
+    if url.scheme != "https" or not url.hostname:
+        raise ValueError(f"{source['url']}: only https URLs are fetched")
+    connection = http.client.HTTPSConnection(url.hostname, url.port or 443, timeout=FETCH_TIMEOUT_SECONDS)
+    try:
+        connection.request("GET", url.path or "/", headers={"User-Agent": "jellysin-plugin-trakt api_matrix"})
+        response = connection.getresponse()
+        if response.status != 200:
+            raise ValueError(f"{source['url']}: HTTP {response.status}")
         body = response.read(MAX_SPEC_BYTES + 1)
+    finally:
+        connection.close()
     if len(body) > MAX_SPEC_BYTES:
         raise ValueError(f"{source['url']}: document larger than {MAX_SPEC_BYTES} bytes")
     return body
