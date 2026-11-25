@@ -23,9 +23,8 @@ audit:
 secrets:
 	@if command -v gitleaks >/dev/null 2>&1; then $(PRAETORCTL) security secrets; else echo gitleaks is not installed, install it with mise use --global gitleaks@8.30.1 or the gitleaks v8.30.1 release archive binary - a Go-built gitleaks lacks the version stamp and shadows the pinned binary when earlier on PATH e.g. ~/go/bin >&2; exit 1; fi
 test: build
-	@printf '%s\n' 'Project verification unavailable; see the adoption report and AGENTS.md.' >&2
-	@exit 1
+	python3 -c "import sys; sys.exit(0 if sys.version_info >= (3, 14) else 'Python 3.14+ is required for zero-test failure detection')"
+	python3 -m unittest discover -s tests/python
 
 build:
-	@printf '%s\n' 'Project verification unavailable; see the adoption report and AGENTS.md.' >&2
-	@exit 1
+	python3 -m compileall -q tools tests
