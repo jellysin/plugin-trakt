@@ -1,2 +1,14 @@
 __pycache__/
+
+# BEGIN praetor private artifacts (praetorctl adopt)
 .workingdir/
+.workingdir2/
+/.standards/worktrees/
+/.agents/mcp_config.json
+/.standards/cache/
+/.claude/settings.local.json
+/.standards-receipt.json
+/.codacy/
+.github/instructions/codacy.instructions.md
+.cursor/rules/codacy.mdc
+# END praetor private artifacts

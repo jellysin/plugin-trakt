@@ -1,0 +1,57 @@
+---
+version: 1
+repository:
+  owner: jellysin
+  name: plugin-trakt
+  visibility: ""
+  description: ""
+  homepage: ""
+  topics: []
+profiles:
+  - template-seed
+facets:
+  - security:high
+  - agent:sandboxed
+# One maintainer: review mode renders zero required approvals. The count stays, so that
+# restoring independent review keeps the minimum.
+overrides:
+  branch_protection:
+    required_approving_reviewers: 1
+    review_mode: single_maintainer
+register:
+  sources:
+    expected: 13
+    sha256:
+      sha256:ac76ac78e354aa8628cf74916271fef35ec9de2af6244ce254ee449ffabd121e
+    inputs:
+      - path: .paperclip/harness.json
+        surface: prompts
+        kind: message
+        format: json
+        selector: operating_contract.*
+      - path: .paperclip/harness.json
+        surface: prompts
+        kind: message
+        format: json
+        selector: invariants.*
+exceptions:
+  - rule: HISS-11
+    path: .github/workflows/release.yml
+    reason: adoption found the release workflows short of the declared supply chain (SLSA Build Level 3 declared, Level 0 measured; enforce_cosign without a cosign signing step; require_sbom without an SBOM step); raise them as docs/guides/releasing.md in Praetor describes, then remove this entry
+    expires: "2027-02-23"
+    category: D
+  - rule: declared-linters
+    tool: gitleaks
+    reason: adoption scaffolds no CI job for gitleaks declared by facet "security:high"; run it in a workflow, or remove this entry
+    expires: "2027-02-23"
+    category: D
+  - rule: declared-linters
+    tool: semgrep
+    reason: adoption scaffolds no CI job for semgrep declared by profile "template-seed", facet "agent:sandboxed"; run it in a workflow, or remove this entry
+    expires: "2027-02-23"
+    category: D
+  - rule: declared-linters
+    tool: trivy
+    reason: adoption scaffolds no CI job for trivy declared by facet "security:high"; run it in a workflow, or remove this entry
+    expires: "2027-02-23"
+    category: D

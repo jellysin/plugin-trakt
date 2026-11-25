@@ -1,0 +1,30 @@
+---
+id: "template-seed"
+name: "Greenfield Template Seed"
+description: "Bootstrap starter template for newly provisioned repositories
+  pre-wired with standardsctl governance and CI workflows"
+runtime: "polyglot"
+
+complexity:
+  max_cyclomatic: 15
+  max_cognitive: 20
+  max_func_loc: 100
+  max_statements: 75
+
+branch_protection:
+  enforce_linear_history: true
+  require_signed_commits: false
+  required_approving_reviewers: 1
+  dismiss_stale_reviews: true
+
+supply_chain:
+  slsa_level: 1
+  enforce_cosign: false
+  require_sbom: false
+
+linters:
+  - "govet"
+  - "semgrep"
+
+devcontainer_features:
+  - "ghcr.io/devcontainers/features/common-utils:2"

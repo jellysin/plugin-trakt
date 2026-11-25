@@ -1,0 +1,41 @@
+{
+  "name": "jellysin/plugin-trakt",
+  "build": {
+    "dockerfile": "Dockerfile.praetor",
+    "context": "."
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:2": {
+      "installZsh": false,
+      "upgradePackages": true
+    }
+  },
+  "customizations": {
+    "praetor": {
+      "bootstrap": {
+        "version": 1,
+        "state": "source-bundle",
+        "builderImage": "docker.io/library/golang@sha256:eb61c3873c97416fff0116553fff65d67a3549f72e11d9758849a689cdd8b523",
+        "baseImage": "mcr.microsoft.com/devcontainers/base@sha256:91eff046d5c12318fc98e59258982b87ba896c467427ed8b5dab5a02107a5db7",
+        "sourceSHA256": "sha256:1a70969a8a3f01adb29804a3067b8ceb0e2f711ede3e81c33ed13bfe253c645b",
+        "archiveSHA256": "sha256:1102626a30286fc1490c22a8df2870bf5c58dfb05eb29b549ed06855f3b6e25e",
+        "archiveParts": 8,
+        "dockerfileSHA256": "sha256:7d80f8ef21481732acbc1df3351ede605a839e43a681264ec376cfc47b911cf3"
+      }
+    },
+    "vscode": {
+      "extensions": [
+        "GitHub.vscode-pull-request-github",
+        "aquasecurity.trivy-vulnerability-scanner",
+        "eamodio.gitlens",
+        "github.copilot"
+      ],
+      "settings": {
+        "editor.formatOnSave": true,
+        "security.workspace.trust.enabled": true
+      }
+    }
+  },
+  "remoteUser": "vscode",
+  "postCreateCommand": "export PATH=\"/usr/local/bin:$PATH\"; /usr/local/bin/praetorctl compile-context && /usr/bin/make verify-all"
+}
